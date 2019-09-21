@@ -11,9 +11,7 @@ router.get('/api/v1/', api.sendStatus);
 // add bus with regId
 router.post('/api/v1/bus/add', catchErrors(bus.addBusByRegId));
 
-// get bus details with busId
-router.post('/api/v1/bus/get', catchErrors(bus.getBusDetails));
-
-// save last saved
+// save last found location & time
+router.post('/api/v1/bus/status', catchErrors(bus.getBusDetails), catchErrors(bus.saveAndUpdateBusStatus));
 
 module.exports = router;
