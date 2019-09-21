@@ -62,11 +62,10 @@ exports.getBusDetails = async (req, res, next) => {
 
 exports.saveAndUpdateBusStatus = async (req, res) => {
     const { busId, _updated } = req.bus;
-    let status = false;
     const { latitude, longitude, lastSeenAt } = req.body;
 
     const updatedTime = new Date(_updated).getTime();
-
+    let status = false;
     // don't update if data in db is more newer than received
     if (updatedTime < lastSeenAt) {
         const unitItem = await updateBusStatus({
@@ -123,12 +122,6 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
 
 exports.fetchCloserBuses = async (req, res) => {
     const { latitude, longitude, requestedAt } = req.body;
-
-    /**
-     *  ToDO: return only the ones that are
-     *  1. closer to user
-     *  2. that has lastKnown & lastSeenAt is about 1hour
-     */
 
     const response = await getCloserRecords({ latitude, longitude, requestedAt });
 

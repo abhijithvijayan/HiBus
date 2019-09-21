@@ -80,13 +80,14 @@ exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
 
 exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
     const session = driver.session();
-    const { records = [] } = await session.writeTransaction(tx => {
+    // ToDo: match only if last update happened recently
+    const { records = [] } = await session.readTransaction(tx => {
+        // 10000 is in metres (10km)
         return tx.run(
             'MATCH (b:Bus) ' +
-                ' WHERE distance( ' +
-                'b.lastKnown, point({ latitude: $latitudeParam, longitude: $longitudeParam }) ' +
-                ') < 10000 ' +
-                'RETURN b',
+                'WITH point({ latitude: $latitudeParam, longitude: $longitudeParam }) AS p, b ' +
+                'WHERE distance(b.lastKnown, p) < 10000 ' +
+                'RETURN b, distance(b.lastKnown, p) AS d ',
             {
                 latitudeParam: latitude,
                 longitudeParam: longitude,
@@ -94,15 +95,19 @@ exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
         );
     });
     session.close();
+
     if (records.length) {
         const busRecords = records.map(record => {
             const items = record._fields[0] ? record._fields[0].properties : null;
+            const distance = record._fields[1] || null;
+
             if (items) {
                 return {
-                    lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt') ? items.lastSeenAt : '',
-                    busId: Object.prototype.hasOwnProperty.call(items, 'busId') ? items.busId : '',
+                    distance: distance || 'N/A',
                     regId: Object.prototype.hasOwnProperty.call(items, 'regId') ? items.regId : '',
+                    busId: Object.prototype.hasOwnProperty.call(items, 'busId') ? items.busId : '',
                     type: Object.prototype.hasOwnProperty.call(items, 'type') ? items.type : '',
+                    lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt') ? items.lastSeenAt : '',
                     lastKnown: Object.prototype.hasOwnProperty.call(items, 'lastKnown')
                         ? {
                               latitude: Object.prototype.hasOwnProperty.call(items.lastKnown, 'x')
