@@ -58,16 +58,21 @@ exports.getBusDetails = async (req, res, next) => {
 
 exports.saveAndUpdateBusStatus = async (req, res) => {
     const { busId } = req.bus;
-
+    let status = false;
     const { lat, lng, lastSeenAt } = req.body;
 
     const updateStatus = await updateBusStatus({ busId, lat, lng, lastSeenAt });
 
+    if (updateStatus) {
+        status = true;
+    }
+
     const promoCode = generate('1245689ABEFKLPRTVXZ', 12);
 
     return res.status(201).json({
-        busId,
+        status,
         promoCode: `${promoCode.slice(0, 4)}-${promoCode.slice(4, 8)}-${promoCode.slice(8, 12)}`,
+        busId,
         _reported: new Date().getTime(),
     });
 };
