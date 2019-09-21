@@ -30,11 +30,23 @@ exports.createBus = async ({ regId }) => {
     return bus;
 };
 
-exports.getBusDetails = async ({ regId }) => {
+exports.getBusByRegId = async ({ regId }) => {
     const session = driver.session();
     const { records = [] } = await session.readTransaction(tx => {
         return tx.run('MATCH (b:Bus { regId : $regIdParam }) RETURN b', {
             regIdParam: regId.toUpperCase(),
+        });
+    });
+    session.close();
+    const bus = records.length && records[0].get('b').properties;
+    return bus;
+};
+
+exports.getBusByBusId = async ({ busId }) => {
+    const session = driver.session();
+    const { records = [] } = await session.readTransaction(tx => {
+        return tx.run('MATCH (b:Bus { busId : $busIdParam }) RETURN b', {
+            busIdParam: busId.toLowerCase(),
         });
     });
     session.close();

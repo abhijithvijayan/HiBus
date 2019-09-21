@@ -8,6 +8,12 @@ const api = require('./api');
 
 router.get('/api/v1/', api.sendStatus);
 
-router.post('/api/v1/bus/add', catchErrors(bus.addBus));
+// add bus with regId
+router.post('/api/v1/bus/add', catchErrors(bus.addBusByRegId));
+
+// get bus details with busId
+router.post('/api/v1/bus/get', catchErrors(bus.getBusDetails));
+
+// save last saved
 
 module.exports = router;
