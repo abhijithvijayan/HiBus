@@ -13,7 +13,7 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 'ON MATCH SET id.count = id.count + 1, id.busRandomPrefix = $busRandomPrefixParam ' +
                 'WITH id.busFixedPrefix + id.busRandomPrefix AS bid, id ' +
                 'MERGE (b:Bus { regId : $regIdParam }) ' +
-                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
+                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b._updated = $_updatedParam, b.from = point($fromParam), b.to = point($toParam), b.type = $typeParam ' +
                 'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
                 'RETURN b',
             {
@@ -21,8 +21,8 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 busFixedPrefixParam: `bus_`,
                 busRandomPrefixParam: `${busRandomPrefix}_${regId.toLowerCase()}`,
                 regIdParam: regId.toUpperCase(),
-                fromParam: JSON.stringify(from),
-                toParam: JSON.stringify(to),
+                fromParam: from,
+                toParam: to,
                 typeParam: type.toUpperCase(),
                 _createdParam: new Date().toJSON(),
                 _updatedParam: new Date().toJSON(),

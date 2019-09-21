@@ -15,11 +15,11 @@ exports.addBusValidationCriterias = [
         .exists()
         .withMessage('Enter a valid bus source route'),
     validator
-        .body('from.lat')
+        .body('from.latitude')
         .exists()
         .withMessage('Enter a valid bus source route'),
     validator
-        .body('from.lng')
+        .body('from.longitude')
         .exists()
         .withMessage('Enter a valid bus source route'),
     validator
@@ -27,11 +27,11 @@ exports.addBusValidationCriterias = [
         .exists()
         .withMessage('Enter a valid bus destination route'),
     validator
-        .body('to.lat')
+        .body('to.latitude')
         .exists()
         .withMessage('Enter a valid bus destination route'),
     validator
-        .body('to.lng')
+        .body('to.longitude')
         .exists()
         .withMessage('Enter a valid bus destination route'),
 ];
@@ -44,10 +44,10 @@ exports.addBusValidationBody = (req, res, next) => {
         const typeError = errorsObj.type && errorsObj.type.msg;
         const fromError = errorsObj.from && errorsObj.from.msg;
         const toError = errorsObj.to && errorsObj.to.msg;
-        const toLatError = errorsObj['to.lat'] && errorsObj['to.lat'].msg;
-        const toLngError = errorsObj['to.lng'] && errorsObj['to.lng'].msg;
-        const fromLatError = errorsObj['from.lat'] && errorsObj['from.lat'].msg;
-        const fromLngError = errorsObj['from.lng'] && errorsObj['from.lng'].msg;
+        const toLatError = errorsObj['to.latitude'] && errorsObj['to.latitude'].msg;
+        const toLngError = errorsObj['to.longitude'] && errorsObj['to.longitude'].msg;
+        const fromLatError = errorsObj['from.latitude'] && errorsObj['from.latitude'].msg;
+        const fromLngError = errorsObj['from.longitude'] && errorsObj['from.longitude'].msg;
 
         return res.status(400).json({
             error: {
