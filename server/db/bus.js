@@ -13,8 +13,8 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 'ON MATCH SET id.count = id.count + 1, id.busRandomPrefix = $busRandomPrefixParam ' +
                 'WITH id.busFixedPrefix + id.busRandomPrefix AS bid, id ' +
                 'MERGE (b:Bus { regId : $regIdParam }) ' +
-                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
-                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
+                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
+                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
                 'RETURN b',
             {
                 identifierParam: 'Bus_Counter',
@@ -25,6 +25,7 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 toParam: JSON.stringify(to),
                 typeParam: type.toUpperCase(),
                 _createdParam: new Date().toJSON(),
+                _updatedParam: new Date().toJSON(),
             }
         );
     });
@@ -62,7 +63,7 @@ exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
     const { records = [] } = await session.readTransaction(tx => {
         return tx.run(
             'MERGE (b:Bus { busId : $busIdParam }) ' +
-                'SET b._updated = $updatedParam, b.lastKnown = $lastKnownParam, b.lastSeenAt = $lastSeenAtParam ' +
+                'SET b._updated = $_updatedParam, b.lastKnown = $lastKnownParam, b.lastSeenAt = $lastSeenAtParam ' +
                 'RETURN b',
             {
                 busIdParam: busId.toLowerCase(),
@@ -71,7 +72,7 @@ exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
                     lng,
                 }),
                 lastSeenAtParam: `${lastSeenAt}`,
-                updatedParam: new Date().toJSON(),
+                _updatedParam: new Date().toJSON(),
             }
         );
     });

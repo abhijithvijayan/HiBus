@@ -46,6 +46,7 @@ exports.getBusDetails = async (req, res, next) => {
         req.bus = {
             regId: bus.regId,
             busId,
+            _updated: bus._updated,
             msg: 'Bus exists',
             _reported: new Date().getTime(),
         };
@@ -60,14 +61,18 @@ exports.getBusDetails = async (req, res, next) => {
 };
 
 exports.saveAndUpdateBusStatus = async (req, res) => {
-    const { busId } = req.bus;
+    const { busId, _updated } = req.bus;
     let status = false;
     const { lat, lng, lastSeenAt } = req.body;
 
-    const updateStatus = await updateBusStatus({ busId, lat, lng, lastSeenAt });
+    const updatedTime = new Date(_updated).getTime();
 
-    if (updateStatus) {
-        status = true;
+    // don't update if data in db is more newer than received
+    if (updatedTime < lastSeenAt) {
+        const unitItem = await updateBusStatus({ busId, lat, lng, lastSeenAt });
+        if (unitItem) {
+            status = true;
+        }
     }
 
     const promoCode = generate('1245689ABEFKLPRTVXZ', 12);
