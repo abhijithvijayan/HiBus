@@ -77,9 +77,38 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
 
     const promoCode = generate('1245689ABEFKLPRTVXZ', 12);
 
-    return res.status(201).json({
+    // promotional brands
+    const brands = {
+        0: {
+            name: 'Uber',
+            description: 'UberMoto Offer - Get Upto 50% OFF',
+            discount: '50%',
+            type: 'OFF',
+        },
+        1: {
+            name: 'Zomato',
+            description: 'Get Upto Rs.300 Cashback on First Order with this coupon',
+            discount: 'Rs.300',
+            type: 'CASHBACK',
+        },
+        2: {
+            name: 'OYO',
+            description: 'OYO Hotels at Just Rs.999 or less - Use Coupon today',
+            discount: 'Best Price',
+            type: '',
+        },
+        3: {
+            name: 'BookMyShow',
+            description: 'Flat Rs.85 OFF On All Movie Tickets on applying coupon',
+            discount: 'Rs.85',
+            type: 'OFF',
+        },
+    };
+
+    return res.status(200).json({
         status,
         promoCode: `${promoCode.slice(0, 4)}-${promoCode.slice(4, 8)}-${promoCode.slice(8, 12)}`,
+        brand: brands[Math.floor(Math.random() * 4)],
         busId,
         _reported: new Date().getTime(),
     });
