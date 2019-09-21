@@ -7,9 +7,33 @@ exports.addBusValidationCriterias = [
         .exists()
         .withMessage('Enter a valid bus registration id'),
     validator
-        .body('category')
+        .body('type')
         .exists()
-        .withMessage('Enter a valid bus category'),
+        .withMessage('Enter a valid bus type'),
+    validator
+        .body('from')
+        .exists()
+        .withMessage('Enter a valid bus source route'),
+    validator
+        .body('from.lat')
+        .exists()
+        .withMessage('Enter a valid bus source route'),
+    validator
+        .body('from.lng')
+        .exists()
+        .withMessage('Enter a valid bus source route'),
+    validator
+        .body('to')
+        .exists()
+        .withMessage('Enter a valid bus destination route'),
+    validator
+        .body('to.lat')
+        .exists()
+        .withMessage('Enter a valid bus destination route'),
+    validator
+        .body('to.lng')
+        .exists()
+        .withMessage('Enter a valid bus destination route'),
 ];
 
 exports.addBusValidationBody = (req, res, next) => {
@@ -17,10 +41,25 @@ exports.addBusValidationBody = (req, res, next) => {
     if (!errors.isEmpty()) {
         const errorsObj = errors.mapped();
         const regIdError = errorsObj.regId && errorsObj.regId.msg;
-        const categoryError = errorsObj.category && errorsObj.category.msg;
+        const typeError = errorsObj.type && errorsObj.type.msg;
+        const fromError = errorsObj.from && errorsObj.from.msg;
+        const toError = errorsObj.to && errorsObj.to.msg;
+        const toLatError = errorsObj['to.lat'] && errorsObj['to.lat'].msg;
+        const toLngError = errorsObj['to.lng'] && errorsObj['to.lng'].msg;
+        const fromLatError = errorsObj['from.lat'] && errorsObj['from.lat'].msg;
+        const fromLngError = errorsObj['from.lng'] && errorsObj['from.lng'].msg;
+
         return res.status(400).json({
             error: {
-                msg: regIdError || categoryError,
+                msg:
+                    regIdError ||
+                    typeError ||
+                    fromError ||
+                    toError ||
+                    toLatError ||
+                    toLngError ||
+                    fromLatError ||
+                    fromLngError,
                 _reported: new Date().getTime(),
             },
         });

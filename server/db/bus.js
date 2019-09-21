@@ -2,7 +2,7 @@ const generate = require('nanoid/generate');
 
 const driver = require('./neo4j');
 
-exports.createBus = async ({ regId }) => {
+exports.createBus = async ({ regId, type, from, to }) => {
     const session = driver.session();
     const busRandomPrefix = generate('1245689abefklprtvxz', 27 - regId.length);
 
@@ -13,14 +13,17 @@ exports.createBus = async ({ regId }) => {
                 'ON MATCH SET id.count = id.count + 1, id.busRandomPrefix = $busRandomPrefixParam ' +
                 'WITH id.busFixedPrefix + id.busRandomPrefix AS bid, id ' +
                 'MERGE (b:Bus { regId : $regIdParam }) ' +
-                'ON CREATE SET b.busId = bid, b._created = $_createdParam ' +
-                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam ' +
+                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
+                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
                 'RETURN b',
             {
                 identifierParam: 'Bus_Counter',
                 busFixedPrefixParam: `bus_`,
                 busRandomPrefixParam: `${busRandomPrefix}_${regId.toLowerCase()}`,
                 regIdParam: regId.toUpperCase(),
+                fromParam: JSON.stringify(from),
+                toParam: JSON.stringify(to),
+                typeParam: type.toUpperCase(),
                 _createdParam: new Date().toJSON(),
             }
         );

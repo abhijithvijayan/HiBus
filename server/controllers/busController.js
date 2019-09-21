@@ -6,7 +6,7 @@ const { createBus, getBusByRegId, getBusByBusId, updateBusStatus } = require('..
  *  Add Bus
  */
 exports.addBusByRegId = async (req, res) => {
-    let { regId = '' } = req.body;
+    let { regId, type, from, to } = req.body;
 
     const bus = await getBusByRegId({ regId });
 
@@ -21,11 +21,14 @@ exports.addBusByRegId = async (req, res) => {
 
     let busId;
 
-    ({ busId, regId } = await createBus({ regId }));
+    ({ busId, regId, from, to, type } = await createBus({ regId, type, from, to }));
 
     return res.status(201).json({
         regId,
         busId,
+        from,
+        to,
+        type,
         msg: 'Bus registration successful',
         _reported: new Date().getTime(),
     });
