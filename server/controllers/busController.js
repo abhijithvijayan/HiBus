@@ -1,6 +1,6 @@
 const generate = require('nanoid/generate');
 
-const { createBus, getBusByRegId, getBusByBusId } = require('../db/bus');
+const { createBus, getBusByRegId, getBusByBusId, updateBusStatus } = require('../db/bus');
 
 /**
  *  Add Bus
@@ -59,9 +59,11 @@ exports.getBusDetails = async (req, res, next) => {
 exports.saveAndUpdateBusStatus = async (req, res) => {
     const { busId } = req.bus;
 
-    const promoCode = generate('1245689ABEFKLPRTVXZ', 12);
+    const { lat, lng, lastSeenAt } = req.body;
 
-    // ToDo: update bus status
+    const updateStatus = await updateBusStatus({ busId, lat, lng, lastSeenAt });
+
+    const promoCode = generate('1245689ABEFKLPRTVXZ', 12);
 
     return res.status(201).json({
         busId,

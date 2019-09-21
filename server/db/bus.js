@@ -53,3 +53,24 @@ exports.getBusByBusId = async ({ busId }) => {
     const bus = records.length && records[0].get('b').properties;
     return bus;
 };
+
+exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
+    const session = driver.session();
+    const { records = [] } = await session.readTransaction(tx => {
+        return tx.run(
+            'MERGE (b:Bus { busId : $busIdParam }) ' +
+                'SET b._updated = $updatedParam, b.lat = $latParam, b.lng = $lngParam, b.lastSeenAt = $lastSeenAtParam ' +
+                'RETURN b',
+            {
+                busIdParam: busId.toLowerCase(),
+                latParam: lat,
+                lngParam: lng,
+                lastSeenAtParam: `${lastSeenAt}`,
+                updatedParam: new Date().toJSON(),
+            }
+        );
+    });
+    session.close();
+    const bus = records.length && records[0].get('b').properties;
+    return bus;
+};
