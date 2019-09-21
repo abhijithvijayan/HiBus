@@ -63,14 +63,14 @@ exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
     const { records = [] } = await session.writeTransaction(tx => {
         return tx.run(
             'MERGE (b:Bus { busId : $busIdParam }) ' +
-                'SET b._updated = $_updatedParam, b.lastKnown = $lastKnownParam, b.lastSeenAt = $lastSeenAtParam ' +
+                'SET b._updated = $_updatedParam, b.lastKnown = point($lastKnownParam), b.lastSeenAt = $lastSeenAtParam ' +
                 'RETURN b',
             {
                 busIdParam: busId.toLowerCase(),
-                lastKnownParam: JSON.stringify({
-                    lat,
-                    lng,
-                }),
+                lastKnownParam: {
+                    latitude: lat,
+                    longitude: lng,
+                },
                 lastSeenAtParam: `${lastSeenAt}`,
                 _updatedParam: new Date().toJSON(),
             }
