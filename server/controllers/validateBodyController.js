@@ -104,6 +104,38 @@ exports.UpdateBusStatusValidationBody = (req, res, next) => {
     return next();
 };
 
+exports.fetchBusesValidationCriterias = [
+    validator
+        .body('lat')
+        .exists()
+        .withMessage('Latitude missing'),
+    validator
+        .body('lng')
+        .exists()
+        .withMessage('Longitude missing'),
+    validator
+        .body('requestedAt')
+        .exists()
+        .withMessage('Requested time missing'),
+];
+
+exports.fetchBusesValidationBody = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const errorsObj = errors.mapped();
+        const latError = errorsObj.lat && errorsObj.lat.msg;
+        const lngError = errorsObj.lng && errorsObj.lng.msg;
+        const requestedAtError = errorsObj.requestedAt && errorsObj.requestedAt.msg;
+        return res.status(400).json({
+            error: {
+                msg: latError || lngError || requestedAtError,
+                _reported: new Date().getTime(),
+            },
+        });
+    }
+    return next();
+};
+
 /**
  *  Sample Validation example
  */

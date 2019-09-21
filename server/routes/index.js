@@ -26,4 +26,11 @@ router.post(
     catchErrors(bus.saveAndUpdateBusStatus)
 );
 
+router.post(
+    '/api/v1/bus/fetch',
+    validate.fetchBusesValidationCriterias,
+    validate.fetchBusesValidationBody,
+    catchErrors(bus.fetchCloserBuses)
+);
+
 module.exports = router;

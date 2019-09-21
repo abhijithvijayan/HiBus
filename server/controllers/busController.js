@@ -113,3 +113,11 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
         _reported: new Date().getTime(),
     });
 };
+
+exports.fetchCloserBuses = async (req, res) => {
+    const { lat, lng, requestedAt } = req.body;
+
+    return res.status(200).json({
+        _reported: new Date().getTime(),
+    });
+};
