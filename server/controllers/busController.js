@@ -63,13 +63,20 @@ exports.getBusDetails = async (req, res, next) => {
 exports.saveAndUpdateBusStatus = async (req, res) => {
     const { busId, _updated } = req.bus;
     let status = false;
-    const { lat, lng, lastSeenAt } = req.body;
+    const { latitude, longitude, lastSeenAt } = req.body;
 
     const updatedTime = new Date(_updated).getTime();
 
     // don't update if data in db is more newer than received
     if (updatedTime < lastSeenAt) {
-        const unitItem = await updateBusStatus({ busId, lat, lng, lastSeenAt });
+        const unitItem = await updateBusStatus({
+            busId,
+            lastKnown: {
+                latitude,
+                longitude,
+            },
+            lastSeenAt,
+        });
         if (unitItem) {
             status = true;
         }
@@ -115,7 +122,7 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
 };
 
 exports.fetchCloserBuses = async (req, res) => {
-    const { lat, lng, requestedAt } = req.body;
+    const { latitude, longitude, requestedAt } = req.body;
 
     return res.status(200).json({
         _reported: new Date().getTime(),

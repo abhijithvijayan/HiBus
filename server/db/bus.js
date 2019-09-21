@@ -58,7 +58,7 @@ exports.getBusByBusId = async ({ busId }) => {
     return bus;
 };
 
-exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
+exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
     const session = driver.session();
     const { records = [] } = await session.writeTransaction(tx => {
         return tx.run(
@@ -67,10 +67,7 @@ exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
                 'RETURN b',
             {
                 busIdParam: busId.toLowerCase(),
-                lastKnownParam: {
-                    latitude: lat,
-                    longitude: lng,
-                },
+                lastKnownParam: lastKnown,
                 lastSeenAtParam: `${lastSeenAt}`,
                 _updatedParam: new Date().toJSON(),
             }

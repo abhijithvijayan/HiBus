@@ -73,11 +73,11 @@ exports.UpdateBusStatusValidationCriterias = [
         .exists()
         .withMessage('Enter a valid bus id'),
     validator
-        .body('lat')
+        .body('latitude')
         .exists()
         .withMessage('Latitude missing'),
     validator
-        .body('lng')
+        .body('longitude')
         .exists()
         .withMessage('Longitude missing'),
     validator
@@ -91,8 +91,8 @@ exports.UpdateBusStatusValidationBody = (req, res, next) => {
     if (!errors.isEmpty()) {
         const errorsObj = errors.mapped();
         const busIdError = errorsObj.busId && errorsObj.busId.msg;
-        const latError = errorsObj.lat && errorsObj.lat.msg;
-        const lngError = errorsObj.lng && errorsObj.lng.msg;
+        const latError = errorsObj.latitude && errorsObj.latitude.msg;
+        const lngError = errorsObj.longitude && errorsObj.longitude.msg;
         const lastSeenAtError = errorsObj.lastSeenAt && errorsObj.lastSeenAt.msg;
         return res.status(400).json({
             error: {
@@ -106,11 +106,11 @@ exports.UpdateBusStatusValidationBody = (req, res, next) => {
 
 exports.fetchBusesValidationCriterias = [
     validator
-        .body('lat')
+        .body('latitude')
         .exists()
         .withMessage('Latitude missing'),
     validator
-        .body('lng')
+        .body('longitude')
         .exists()
         .withMessage('Longitude missing'),
     validator
@@ -123,8 +123,8 @@ exports.fetchBusesValidationBody = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const errorsObj = errors.mapped();
-        const latError = errorsObj.lat && errorsObj.lat.msg;
-        const lngError = errorsObj.lng && errorsObj.lng.msg;
+        const latError = errorsObj.latitude && errorsObj.latitude.msg;
+        const lngError = errorsObj.longitude && errorsObj.longitude.msg;
         const requestedAtError = errorsObj.requestedAt && errorsObj.requestedAt.msg;
         return res.status(400).json({
             error: {
