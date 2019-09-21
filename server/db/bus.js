@@ -60,7 +60,7 @@ exports.getBusByBusId = async ({ busId }) => {
 
 exports.updateBusStatus = async ({ busId, lat, lng, lastSeenAt }) => {
     const session = driver.session();
-    const { records = [] } = await session.readTransaction(tx => {
+    const { records = [] } = await session.writeTransaction(tx => {
         return tx.run(
             'MERGE (b:Bus { busId : $busIdParam }) ' +
                 'SET b._updated = $_updatedParam, b.lastKnown = $lastKnownParam, b.lastSeenAt = $lastSeenAtParam ' +
