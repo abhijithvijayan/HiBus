@@ -1,6 +1,6 @@
 const generate = require('nanoid/generate');
 
-const { createBus, getBusByRegId, getBusByBusId, updateBusStatus } = require('../db/bus');
+const { createBus, getBusByRegId, getBusByBusId, updateBusStatus, getCloserRecords } = require('../db/bus');
 
 /**
  *  Add Bus
@@ -124,7 +124,25 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
 exports.fetchCloserBuses = async (req, res) => {
     const { latitude, longitude, requestedAt } = req.body;
 
-    return res.status(200).json({
-        _reported: new Date().getTime(),
+    /**
+     *  ToDO: return only the ones that are
+     *  1. closer to user
+     *  2. that has lastKnown & lastSeenAt is about 1hour
+     */
+
+    const response = await getCloserRecords({ latitude, longitude, requestedAt });
+
+    if (response.status) {
+        return res.status(200).json({
+            busRecords: response.busRecords,
+            _reported: new Date().getTime(),
+        });
+    }
+
+    return res.status(403).json({
+        error: {
+            msg: response.error,
+            _reported: new Date().getTime(),
+        },
     });
 };

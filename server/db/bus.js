@@ -77,3 +77,65 @@ exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
     const bus = records.length && records[0].get('b').properties;
     return bus;
 };
+
+exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
+    const session = driver.session();
+    const { records = [] } = await session.writeTransaction(tx => {
+        return tx.run(
+            'MATCH (b:Bus) ' +
+                ' WHERE distance( ' +
+                'b.lastKnown, point({ latitude: $latitudeParam, longitude: $longitudeParam }) ' +
+                ') < 10000 ' +
+                'RETURN b',
+            {
+                latitudeParam: latitude,
+                longitudeParam: longitude,
+            }
+        );
+    });
+    session.close();
+    if (records.length) {
+        const busRecords = records.map(record => {
+            const items = record._fields[0] ? record._fields[0].properties : null;
+            if (items) {
+                return {
+                    lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt') ? items.lastSeenAt : '',
+                    busId: Object.prototype.hasOwnProperty.call(items, 'busId') ? items.busId : '',
+                    regId: Object.prototype.hasOwnProperty.call(items, 'regId') ? items.regId : '',
+                    type: Object.prototype.hasOwnProperty.call(items, 'type') ? items.type : '',
+                    lastKnown: Object.prototype.hasOwnProperty.call(items, 'lastKnown')
+                        ? {
+                              latitude: Object.prototype.hasOwnProperty.call(items.lastKnown, 'x')
+                                  ? items.lastKnown.x
+                                  : '',
+                              longitude: Object.prototype.hasOwnProperty.call(items.lastKnown, 'y')
+                                  ? items.lastKnown.y
+                                  : '',
+                          }
+                        : '',
+                    from: Object.prototype.hasOwnProperty.call(items, 'from')
+                        ? {
+                              latitude: Object.prototype.hasOwnProperty.call(items.from, 'x') ? items.from.x : '',
+                              longitude: Object.prototype.hasOwnProperty.call(items.from, 'y') ? items.from.y : '',
+                          }
+                        : '',
+                    to: Object.prototype.hasOwnProperty.call(items, 'to')
+                        ? {
+                              latitude: Object.prototype.hasOwnProperty.call(items.to, 'x') ? items.to.x : '',
+                              longitude: Object.prototype.hasOwnProperty.call(items.to, 'y') ? items.to.y : '',
+                          }
+                        : '',
+                    _created: Object.prototype.hasOwnProperty.call(items, '_created')
+                        ? new Date(items._created).getTime()
+                        : '',
+                    _updated: Object.prototype.hasOwnProperty.call(items, '_updated')
+                        ? new Date(items._updated).getTime()
+                        : '',
+                };
+            }
+            return {};
+        });
+        return { status: true, busRecords };
+    }
+    return { status: false, error: 'No buses nearby at this time. Please wait for sometime.' };
+};
