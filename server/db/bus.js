@@ -11,7 +11,7 @@ exports.createBus = async ({ regId }) => {
             'MERGE (id:UniqueId { identifier: $identifierParam, busFixedPrefix: $busFixedPrefixParam }) ' +
                 'ON CREATE SET id.count = 1, id.busRandomPrefix = $busRandomPrefixParam ' +
                 'ON MATCH SET id.count = id.count + 1, id.busRandomPrefix = $busRandomPrefixParam ' +
-                'WITH id.busFixedPrefix + id.busRandomPrefix  AS bid, id ' +
+                'WITH id.busFixedPrefix + id.busRandomPrefix AS bid, id ' +
                 'MERGE (b:Bus { regId : $regIdParam }) ' +
                 'ON CREATE SET b.busId = bid, b._created = $_createdParam ' +
                 'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam ' +
@@ -34,7 +34,7 @@ exports.getBusDetails = async ({ regId }) => {
     const session = driver.session();
     const { records = [] } = await session.readTransaction(tx => {
         return tx.run('MATCH (b:Bus { regId : $regIdParam }) RETURN b', {
-            regIdParam: regId,
+            regIdParam: regId.toUpperCase(),
         });
     });
     session.close();

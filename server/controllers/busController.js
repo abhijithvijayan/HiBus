@@ -1,7 +1,7 @@
 const { createBus, getBusDetails } = require('../db/bus');
 
 exports.addBus = async (req, res) => {
-    const { regId } = req.body;
+    let { regId } = req.body;
 
     const bus = await getBusDetails({ regId });
 
@@ -13,7 +13,10 @@ exports.addBus = async (req, res) => {
             },
         });
     }
-    const { busId } = await createBus({ regId });
+
+    let busId;
+
+    ({ busId, regId } = await createBus({ regId }));
     // ToDo: extract busFixedPrefix from this and send back
 
     return res.status(201).json({
