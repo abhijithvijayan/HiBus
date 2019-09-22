@@ -34,6 +34,18 @@ exports.addBusValidationCriterias = [
         .body('to.longitude')
         .exists()
         .withMessage('Enter a valid bus destination route'),
+    validator
+        .body('route')
+        .exists()
+        .withMessage('Enter valid route names'),
+    validator
+        .body('route.source')
+        .exists()
+        .withMessage('Enter valid route names'),
+    validator
+        .body('route.destination')
+        .exists()
+        .withMessage('Enter valid route names'),
 ];
 
 exports.addBusValidationBody = (req, res, next) => {
@@ -42,12 +54,15 @@ exports.addBusValidationBody = (req, res, next) => {
         const errorsObj = errors.mapped();
         const regIdError = errorsObj.regId && errorsObj.regId.msg;
         const typeError = errorsObj.type && errorsObj.type.msg;
-        const fromError = errorsObj.from && errorsObj.from.msg;
         const toError = errorsObj.to && errorsObj.to.msg;
         const toLatError = errorsObj['to.latitude'] && errorsObj['to.latitude'].msg;
         const toLngError = errorsObj['to.longitude'] && errorsObj['to.longitude'].msg;
+        const fromError = errorsObj.from && errorsObj.from.msg;
         const fromLatError = errorsObj['from.latitude'] && errorsObj['from.latitude'].msg;
         const fromLngError = errorsObj['from.longitude'] && errorsObj['from.longitude'].msg;
+        const routeError = errorsObj.route && errorsObj.route.msg;
+        const routeSrcError = errorsObj['route.source'] && errorsObj['route.source'].msg;
+        const routeDestError = errorsObj['route.destination'] && errorsObj['route.destination'].msg;
 
         return res.status(400).json({
             error: {
@@ -59,7 +74,10 @@ exports.addBusValidationBody = (req, res, next) => {
                     toLatError ||
                     toLngError ||
                     fromLatError ||
-                    fromLngError,
+                    fromLngError ||
+                    routeError ||
+                    routeSrcError ||
+                    routeDestError,
                 _reported: new Date().getTime(),
             },
         });

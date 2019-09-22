@@ -3,7 +3,7 @@ const moment = require('moment');
 
 const driver = require('./neo4j');
 
-exports.createBus = async ({ regId, type, from, to }) => {
+exports.createBus = async ({ regId, type, from, to, route }) => {
     const session = driver.session();
     const busRandomPrefix = generate('1245689abefklprtvxz', 27 - regId.length);
 
@@ -14,8 +14,8 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 'ON MATCH SET id.count = id.count + 1, id.busRandomPrefix = $busRandomPrefixParam ' +
                 'WITH id.busFixedPrefix + id.busRandomPrefix AS bid, id ' +
                 'MERGE (b:Bus { regId : $regIdParam }) ' +
-                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b._updated = $_updatedParam, b.from = point($fromParam), b.to = point($toParam), b.type = $typeParam ' +
-                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.type = $typeParam ' +
+                'ON CREATE SET b.busId = bid, b._created = $_createdParam, b._updated = $_updatedParam, b.from = point($fromParam), b.to = point($toParam), b.route = $routeParam, b.type = $typeParam ' +
+                'ON MATCH SET id.count = id.count - 1, b._created = $_createdParam, b._updated = $_updatedParam, b.from = $fromParam, b.to = $toParam, b.route = $routeParam, b.type = $typeParam ' +
                 'RETURN b',
             {
                 identifierParam: 'Bus_Counter',
@@ -24,6 +24,10 @@ exports.createBus = async ({ regId, type, from, to }) => {
                 regIdParam: regId.toUpperCase(),
                 fromParam: from,
                 toParam: to,
+                routeParam: JSON.stringify({
+                    source: `${route.source.toUpperCase()}`,
+                    destination: `${route.destination.toUpperCase()}`,
+                }),
                 typeParam: type.toUpperCase(),
                 _createdParam: new Date().toJSON(),
                 _updatedParam: new Date().toJSON(),
@@ -101,8 +105,9 @@ exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
         const busRecords = records.map(record => {
             const items = record._fields[0] ? record._fields[0].properties : null;
             const distance = record._fields[1] || null;
-
             if (items) {
+                const route = Object.prototype.hasOwnProperty.call(items, 'route') ? JSON.parse(items.route) : '';
+
                 return {
                     distance: distance || 'N/A',
                     regId: Object.prototype.hasOwnProperty.call(items, 'regId') ? items.regId : '',
@@ -133,6 +138,15 @@ exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
                               longitude: Object.prototype.hasOwnProperty.call(items.to, 'y') ? items.to.y : '',
                           }
                         : '',
+                    route:
+                        route !== ''
+                            ? {
+                                  source: Object.prototype.hasOwnProperty.call(route, 'source') ? route.source : '',
+                                  destination: Object.prototype.hasOwnProperty.call(route, 'destination')
+                                      ? route.destination
+                                      : '',
+                              }
+                            : '',
                     _created: Object.prototype.hasOwnProperty.call(items, '_created')
                         ? new Date(items._created).getTime()
                         : '',
