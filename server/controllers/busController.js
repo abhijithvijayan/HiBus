@@ -77,7 +77,7 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
                 latitude,
                 longitude,
             },
-            lastSeenAt: lastSeenInMS,
+            lastSeenAt,
         });
         if (unitItem) {
             status = true;
