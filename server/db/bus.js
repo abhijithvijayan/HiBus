@@ -63,6 +63,8 @@ exports.getBusByBusId = async ({ busId }) => {
     return bus;
 };
 
+/** FIX UTC error */
+
 exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
     const session = driver.session();
     const { records = [] } = await session.writeTransaction(tx => {
@@ -73,7 +75,8 @@ exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
             {
                 busIdParam: busId.toLowerCase(),
                 lastKnownParam: lastKnown,
-                lastSeenAtParam: new Date(lastSeenAt).toJSON(),
+                // lastSeenAtParam: new Date(lastSeenAt).toJSON(),
+                lastSeenAtParam: new Date().toJSON(),
                 _updatedParam: new Date().toJSON(),
             }
         );
