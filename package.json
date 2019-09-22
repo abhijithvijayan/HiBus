@@ -11,6 +11,8 @@
     "nohoist": []
   },
   "scripts": {
+    "dev:web": "yarn workspace client dev",
+    "build:web": "yarn workspace client build",
     "server": "yarn workspace server server",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
