@@ -107,7 +107,9 @@ exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
                     regId: Object.prototype.hasOwnProperty.call(items, 'regId') ? items.regId : '',
                     busId: Object.prototype.hasOwnProperty.call(items, 'busId') ? items.busId : '',
                     type: Object.prototype.hasOwnProperty.call(items, 'type') ? items.type : '',
-                    lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt') ? items.lastSeenAt : '',
+                    lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt')
+                        ? new Date(items.lastSeenAt).getTime()
+                        : '',
                     lastKnown: Object.prototype.hasOwnProperty.call(items, 'lastKnown')
                         ? {
                               latitude: Object.prototype.hasOwnProperty.call(items.lastKnown, 'x')
