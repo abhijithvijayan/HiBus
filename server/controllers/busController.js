@@ -70,7 +70,7 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
 
     let status = false;
     // don't update if data in db is more newer than received
-    if (updatedTime < lastSeenAt) {
+    if (updatedTime < lastSeenInMS) {
         const unitItem = await updateBusStatus({
             busId,
             lastKnown: {
