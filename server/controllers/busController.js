@@ -65,6 +65,9 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
     const { latitude, longitude, lastSeenAt } = req.body;
 
     const updatedTime = new Date(_updated).getTime();
+    // change lastSeenAt from FLUTTER app to ms
+    const lastSeenInMS = new Date(lastSeenAt).getTime();
+
     let status = false;
     // don't update if data in db is more newer than received
     if (updatedTime < lastSeenAt) {
@@ -74,7 +77,7 @@ exports.saveAndUpdateBusStatus = async (req, res) => {
                 latitude,
                 longitude,
             },
-            lastSeenAt,
+            lastSeenAt: lastSeenInMS,
         });
         if (unitItem) {
             status = true;
