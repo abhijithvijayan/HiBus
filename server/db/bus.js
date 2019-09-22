@@ -68,7 +68,7 @@ exports.updateBusStatus = async ({ busId, lastKnown, lastSeenAt }) => {
             {
                 busIdParam: busId.toLowerCase(),
                 lastKnownParam: lastKnown,
-                lastSeenAtParam: `${lastSeenAt}`,
+                lastSeenAtParam: new Date(lastSeenAt).toJSON(),
                 _updatedParam: new Date().toJSON(),
             }
         );
