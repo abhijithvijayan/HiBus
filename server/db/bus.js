@@ -1,4 +1,5 @@
 const generate = require('nanoid/generate');
+const moment = require('moment');
 
 const driver = require('./neo4j');
 
@@ -108,7 +109,7 @@ exports.getCloserRecords = async ({ latitude, longitude, requestedAt }) => {
                     busId: Object.prototype.hasOwnProperty.call(items, 'busId') ? items.busId : '',
                     type: Object.prototype.hasOwnProperty.call(items, 'type') ? items.type : '',
                     lastSeenAt: Object.prototype.hasOwnProperty.call(items, 'lastSeenAt')
-                        ? new Date(items.lastSeenAt).getTime()
+                        ? moment(items.lastSeenAt).fromNow()
                         : '',
                     lastKnown: Object.prototype.hasOwnProperty.call(items, 'lastKnown')
                         ? {
